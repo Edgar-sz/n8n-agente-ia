@@ -57,3 +57,10 @@ Cada servicio requiere su propia configuración y autenticación (**API Keys**, 
 - Asegúrate de tener acceso a todas las **APIs y servicios mencionados**.  
 - Para Redis, puedes usar una instancia en la nube o local.  
 - Ajusta los **prompts y condiciones** según tu caso de uso.
+
+## 📎 Recursos en video
+
+- [🎥 VIDEO: Conexión de whatsapp con n8n](https://www.youtube.com/watch?v=4qG8TA_yMxI&t=116s)  
+- [🎥 VIDEO: Creación de agente conversacinonal](https://www.youtube.com/watch?v=-T5i6wDOM2E)
+- [🎥 VIDEO: Creación buffer de mensajes](https://www.youtube.com/watch?v=HubhYIo4Iys&t=881s)
+- [🎥 VIDEO: Solución problema redis](https://www.youtube.com/watch?v=YFJqf-utKxc)
