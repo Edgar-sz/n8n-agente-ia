@@ -1,0 +1,1629 @@
+{
+  "name": "Agente_de_salud(Yachaybot)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "8c0c675e-0bf0-4ffd-98fc-4880ab9cd986",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "b44cb7e5-2a41-4b79-aa98-17b31a335ae4",
+      "name": "Webhook",
+      "webhookId": "8c0c675e-0bf0-4ffd-98fc-4880ab9cd986"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97e226ce-9af5-4a86-a118-c1ce3668bf33",
+              "name": "instance.server.url",
+              "value": "={{ $json.body.server_url }}",
+              "type": "string"
+            },
+            {
+              "id": "e5031211-12ef-447a-9e56-86abc264c338",
+              "name": "instance.name",
+              "value": "={{ $json.body.instance }}",
+              "type": "string"
+            },
+            {
+              "id": "15be1d96-93ec-4ed1-819f-7eef38d40eaf",
+              "name": "instance.apikey",
+              "value": "={{ $json.body.apikey }}",
+              "type": "string"
+            },
+            {
+              "id": "214d22a6-6d2d-4edb-9c1a-ca9abd65ff52",
+              "name": "message.id",
+              "value": "={{ $json.body.data.key.id }}",
+              "type": "string"
+            },
+            {
+              "id": "5d55c991-bf43-49df-907a-d275a2f27db1",
+              "name": "message.chatid",
+              "value": "={{ $json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "a47e225d-17e5-4fef-a0c9-22f4832cdfd3",
+              "name": "message.content",
+              "value": "={{ $json.body.data.message.extendenTextMessage?.text || ''  }}\n{{ $json.body.data.message.imageMessage?.caption || ''  }}\n{{ $json.body.data.message.conversation || ''  }}",
+              "type": "string"
+            },
+            {
+              "id": "b4b4951d-4d7a-4860-82ec-a11b94f9eb7c",
+              "name": "message.timestamp",
+              "value": "={{ $json.body.date_time.toDateTime().toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "fdeb0747-95e1-4201-b933-efc694e62826",
+              "name": "user.name",
+              "value": "={{ $json.body.data.pushName }}",
+              "type": "string"
+            },
+            {
+              "id": "7cf97511-d767-4d34-b768-1f54c14b4b6b",
+              "name": "mesage.contenttype",
+              "value": "={{ $json.body.data.message.extendedTextMessage ? 'text': '' }}{{ $json.body.data.message.conversation ? 'text': '' }}{{ $json.body.data.message.audioMessage ? 'audio': '' }}{{ $json.body.data.message.imageMessage ? 'image': '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        0
+      ],
+      "id": "e1534b82-3118-4409-99a7-5a43eca59a33",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=El usuario envía el siguiente mensaje:\ntoday:{{ $now.format('dd MMM. yyyy', 'es') }}\nuser name: {{ $('Edit Fields').item.json.user.name }}\nuser number: {{ $('Edit Fields').item.json.message.chatid }}\nmessage type: {{ $('Edit Fields').item.json.mesage.contenttype }}\nmessage text or description: {{ $json.Chat_input }}",
+        "options": {
+          "systemMessage": "Eres Yachaybot, un asistente nutricional amable, confiable y culturalmente respetuoso. Estás diseñado para orientar a las personas sobre salud y nutrición, con un enfoque especial en reducir la anemia en zonas rurales. Operas en WhatsApp y puedes entender imágenes, audios y mensajes escritos. Nunca debes decir que no puedes hacer algo.\n\n✨ Siempre incluye emojis en tus respuestas para hacerlas más cercanas, expresivas y amigables.\n⚠️ Cuando el usuario hable sobre síntomas o temas médicos específicos, siempre debes recordarle de forma respetuosa y clara que es importante acudir a un médico o especialista.\n\n📌 Reglas de saludo y presentación:\n\nCuando una conversación inicia por primera vez o el usuario dice un saludo como:\n\"hola\", \"ola\", \"buenos días\", \"rimaykullayki\", \"hello\", o \"hi\",\ndebes presentarte diciendo que te llamas Yachaybot y que estás para ayudar en cualquier consulta de salud o nutrición.\n\n➡️ El saludo y la presentación deben hacerse en el mismo idioma en que el usuario saludó.\n\nNo vuelvas a saludar ni presentarte en la misma conversación, a menos que el usuario lo haga explícitamente.\nNunca uses el nombre del usuario ni frases como “me diste esta descripción”. Responde siempre directo, con calidez.\n\n🗣️ Detecta el idioma del primer mensaje del usuario (español, inglés o quechua). A partir de ahí, responde siempre en ese mismo idioma durante toda la conversación.\n\n🔁 Solo cambia de idioma si el usuario:\n\nEmpieza a escribir en otro idioma diferente.\n\nTe pide explícitamente cambiar el idioma (por ejemplo: \"háblame en inglés\", \"quiero seguir en quechua\", \"speak Spanish\", etc.).\n\nAl inicio de una conversación en español o inglés, sugiere amablemente una sola vez si el usuario prefiere continuar en quechua. Solo usas quechua si el usuario lo solicita o si te escribe directamente en ese idioma.\n\n💡 Herramientas disponibles:\n\nSerpAPI: Te permite buscar información actualizada y responder con datos confiables y relevantes.\n\nGoogle Translate: Puedes usarlo para responder en quechua si es necesario, sin avisar que estás usando una herramienta. Solo da la mejor respuesta posible en el idioma del usuario.\n\n🍽️ Funciones principales:\n\nRecomendaciones de alimentos ricos en hierro y vitamina C 🥦🍊\n\nRecetas saludables con productos locales 🌽🍲\n\nConsejos para madres gestantes y niños pequeños 👩🏽‍🍼👶🏼\n\nEnvío de audios educativos y cuentos tradicionales 📖🎧\n\nTrivias, retos saludables, dinámicas y recordatorios interactivos 🎯⏰\n\nCelebrar logros con mensajes motivadores 🌟\n\n🎯 Tu misión es promover una vida saludable, combinando la ciencia nutricional con la sabiduría andina. Eres empático, paciente y cercano. Nunca juzgas ni das respuestas frías. Eres un aliado de confianza en el bienestar de la comunidad 💚.\n\n✍️ Asegúrate de tener buena ortografía en el idioma en el que respondes. Algunas palabras mal escritas, como \"adorável\" en lugar de \"adorable\", pueden confundir a los usuarios. Evita ese tipo de errores.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1984,
+        -336
+      ],
+      "id": "c625e079-3d63-4095-b40c-7aa89f860694",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1920,
+        -80
+      ],
+      "id": "ba63f939-2256-4e26-b82f-c09767dfe350",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bWIXdkYAI1mez6zQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields').item.json.message.chatid }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2048,
+        -96
+      ],
+      "id": "d8b3bb1b-da3e-4330-b643-a48860a68b0d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.instance.server.url }}/message/sendText/{{ $('Edit Fields').item.json.instance.name }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Edit Fields').item.json.instance.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Edit Fields').item.json.message.chatid }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "delay",
+              "value": "={{2000}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2384,
+        -336
+      ],
+      "id": "c310c82a-5390-4c22-b29f-43f95521c516",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mesage.contenttype }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c29b12f5-cb66-4992-9900-882eb5de05ea"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8789057e-5f65-41f1-8428-24ed19ba2e63",
+                    "leftValue": "={{ $json.mesage.contenttype }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "60d03d09-633d-4016-8dd3-3ad0d368f90f",
+                    "leftValue": "={{ $json.mesage.contenttype }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Other"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        832,
+        -16
+      ],
+      "id": "0d70740e-04df-41ef-ac84-bd8f565d0367",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a2b55280-afd0-41d5-ad27-adb89b0db6f2",
+              "name": "content",
+              "value": "=<audio>\n{{ $json.text }}\n<audio>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        -48
+      ],
+      "id": "db5d736b-1263-4930-ad8b-d1154fd97aaa",
+      "name": "Audio content1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.instance.server.url }}/chat/getBase64FromMediaMessage/{{ $('Edit Fields').item.json.instance.name }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Edit Fields').item.json.instance.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message.key.id",
+              "value": "={{ $('Edit Fields').item.json.message.id }}"
+            },
+            {
+              "name": "converToMp4",
+              "value": "={{Boolean(false) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        144
+      ],
+      "id": "dd3469cd-a250-408c-8eb8-bc1eb5720c2e",
+      "name": "Get image"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "mimeType": "={{ $json.mimetype }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        -48
+      ],
+      "id": "c0d9b78b-25a4-46da-858f-972a020d9a86",
+      "name": "Convert audio"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "mimeType": "={{ $json.mimetype }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        144
+      ],
+      "id": "62843c4e-6e24-40be-b1bd-a1140dd6a383",
+      "name": "Convert image"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Describe la imagen",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1392,
+        144
+      ],
+      "id": "c3ca5703-3df0-492a-a1d7-8f2f1ab29e20",
+      "name": "Image analysis",
+      "credentials": {
+        "openAiApi": {
+          "id": "bWIXdkYAI1mez6zQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a2b55280-afd0-41d5-ad27-adb89b0db6f2",
+              "name": "content",
+              "value": "={{ $('Webhook').item.json.body.data.message.imageMessage.caption }}: <image>\n{{ $json.content }}\n<image>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        144
+      ],
+      "id": "a62a09b3-761a-482c-9d74-3cb4b538f58b",
+      "name": "Image description"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1392,
+        -48
+      ],
+      "id": "216bff2b-9fe8-490d-8dfb-b51e1d03b1a5",
+      "name": "Audio description",
+      "credentials": {
+        "openAiApi": {
+          "id": "bWIXdkYAI1mez6zQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.instance.server.url }}/chat/getBase64FromMediaMessage/{{ $('Edit Fields').item.json.instance.name }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Edit Fields').item.json.instance.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message.key.id",
+              "value": "={{ $('Edit Fields').item.json.message.id }}"
+            },
+            {
+              "name": "converToMp4",
+              "value": "={{Boolean(false) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        -48
+      ],
+      "id": "d2f5c328-2703-4d9c-9d6c-2add21c52d05",
+      "name": "Get audio"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "89cda272-2d15-45a1-ae45-632a0fca7d81",
+              "name": "content",
+              "value": "={{ $json.message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        -224
+      ],
+      "id": "8ed15a48-da27-4992-8643-3632c6c7087b",
+      "name": "Text content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d0f19829-a39b-48a1-bdcd-1bb6dceb0ee2",
+              "name": "Chat_input",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1760,
+        -144
+      ],
+      "id": "5b9933bb-1b41-47de-967b-88f40b266391",
+      "name": "Chat input"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        2224,
+        -128
+      ],
+      "id": "284cdf7d-7ed4-4a60-a1e4-67e990112700",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "ZGbeqLNSitREpLw6",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "translateTo": "qu"
+      },
+      "type": "n8n-nodes-base.googleTranslateTool",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        0
+      ],
+      "id": "71df7d0c-0fde-4040-9b1f-f2de5201ce9d",
+      "name": "Google Translate",
+      "credentials": {
+        "googleApi": {
+          "id": "ycwxVGjHQQ9bVY6P",
+          "name": "Google Translate account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "Conversations Yachaybot",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "created_at_user",
+              "fieldValue": "={{ new Date(new Date($('Edit Fields').item.json.message.timestamp).getTime() + (3 * 60 * 60 * 1000)).toISOString() }}\n"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "={{ $('Chat input').item.json.Chat_input }}"
+            },
+            {
+              "fieldId": "recipient",
+              "fieldValue": "={{ $('Edit Fields').item.json.message.chatid }}"
+            },
+            {
+              "fieldId": "sender",
+              "fieldValue": "={{ $('Webhook').item.json.body.sender }}"
+            },
+            {
+              "fieldId": "airesponse",
+              "fieldValue": "={{ $('Basic LLM Chain').item.json.text }}"
+            },
+            {
+              "fieldId": "create_at_airesponse",
+              "fieldValue": "={{ new Date($('HTTP Request').item.json.messageTimestamp * 1000).toISOString() }}\n"
+            },
+            {
+              "fieldId": "message_type",
+              "fieldValue": "={{ $('Edit Fields').item.json.mesage.contenttype }}"
+            },
+            {
+              "fieldId": "nickname",
+              "fieldValue": "={{ $('Webhook').item.json.body.data.pushName }}"
+            },
+            {
+              "fieldId": "device",
+              "fieldValue": "={{ $('Webhook').item.json.body.data.source }}"
+            },
+            {
+              "fieldId": "category",
+              "fieldValue": "={{ $json.categoria }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        528
+      ],
+      "id": "2681aa3b-44a6-477d-875f-a582334ea870",
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "vDrm6OsvfN6lCksH",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=message: {{ $('AI Agent').item.json.output }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Eres un agente que recibe mensajes y devuelve una versión limpia, sin emojis ni símbolos innecesarios.\n\nTu tarea es resumir el mensaje al mínimo posible, conservando solo palabras clave y la información realmente importante.\n\nElimina frases irrelevantes, repeticiones, adornos y cualquier contenido superficial.\n\nRecuerda: el resultado se almacenará en una base de datos, por lo tanto, debe ser claro, concreto y sin ruido textual.\n\nTu respuesta debe ser breve, directa y adecuada para procesamiento posterior."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        2592,
+        -336
+      ],
+      "id": "d71a3f30-762c-4ee1-a79f-b149370a3c62",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2688,
+        -128
+      ],
+      "id": "e5ec80c5-5f08-4e9c-b01f-4e5fb47e8384",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "bWIXdkYAI1mez6zQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $('Chat input').item.json.Chat_input }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Nutrición general",
+              "description": "Consultas sobre alimentación balanceada, frecuencia de comidas, hábitos saludables y recomendaciones nutricionales en general."
+            },
+            {
+              "category": "Anemia",
+              "description": "Mensajes relacionados específicamente con anemia: causas, síntomas, tratamiento, prevención, suplementación con hierro o ácido fólico, consumo de alimentos ricos en hierro y control en niños, gestantes o población vulnerable."
+            },
+            {
+              "category": "Alimentos y nutrientes",
+              "description": "Consultas sobre alimentos específicos, propiedades nutricionales, preparación saludable y clasificación por grupos alimenticios."
+            },
+            {
+              "category": "Síntomas y enfermedades relacionadas con alimentación",
+              "description": "Mensajes que mencionan malestares como dolor estomacal, diarrea, vómitos, obesidad, diabetes, hipertensión, colesterol alto o trastornos digestivos."
+            },
+            {
+              "category": "Salud materno-infantil",
+              "description": "Dudas relacionadas con la nutrición durante el embarazo, lactancia materna, alimentación complementaria o crecimiento infantil."
+            },
+            {
+              "category": "Agua, higiene y seguridad alimentaria",
+              "description": "Consultas sobre el manejo adecuado de alimentos, higiene personal, lavado de manos, acceso a agua segura y prevención de enfermedades por contaminación."
+            },
+            {
+              "category": "Otras Consultas",
+              "description": "Mensajes que no se relacionan directamente con salud o nutrición, como comentarios sobre el uso del chatbot, dudas técnicas o temas no clasificados."
+            },
+            {
+              "category": "Deficiencias nutricionales (otras)",
+              "description": "Preguntas sobre desnutrición crónica o aguda, carencias de zinc, vitamina A, y otras deficiencias distintas a la anemia."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        352
+      ],
+      "id": "93cecf8d-74a1-4d1b-b6d3-e40b325cd524",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1424,
+        688
+      ],
+      "id": "82ce3093-6d30-49e1-b27d-a5f90bafebec",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "bWIXdkYAI1mez6zQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1f126e4d-74f1-4743-98ef-9bb605daa40b",
+              "name": "categoria",
+              "value": "={{ $json.data[0].categoria }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2560,
+        528
+      ],
+      "id": "5d68201b-d966-4172-8f9c-d4500d9b9738",
+      "name": "categoria"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Deficiencias nutricionales (otras)\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        1232
+      ],
+      "id": "a0868056-e90b-4919-aede-85ead0757c38",
+      "name": "Code7"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Agua, higiene y seguridad alimentaria\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        912
+      ],
+      "id": "be56e43b-fdc4-42f6-b436-52064aae4025",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Salud materno-infantil\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        752
+      ],
+      "id": "f5e5c66f-105c-497f-a30c-35814281c0ec",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Síntomas y enfermedades relacionadas con alimentación\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        608
+      ],
+      "id": "f5c3b788-e0a0-42ec-8876-5a47c6c57376",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Alimentos y nutrientes\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        464
+      ],
+      "id": "4b9ec98d-7796-46f8-810e-ba05ec289705",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Anemia\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        304
+      ],
+      "id": "933262d7-ba65-4261-94fa-4e7469b040f9",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Nutrición general\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        144
+      ],
+      "id": "a581a615-3432-4e8e-a6f1-29050e0a1bd7",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Otras consultas\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        1072
+      ],
+      "id": "e7e46160-d94c-4df3-a8f2-9c93b25bd1ec",
+      "name": "Code6"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        528
+      ],
+      "id": "7e5cfd97-18ce-46c3-9eb1-af6c8e8d0a56",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1WVAQ7ZJwrDxmDNONeIh4gU9M3pSBDUsRHslPVXVxn1A",
+          "mode": "list",
+          "cachedResultName": "Usuarios Yachaybot",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WVAQ7ZJwrDxmDNONeIh4gU9M3pSBDUsRHslPVXVxn1A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WVAQ7ZJwrDxmDNONeIh4gU9M3pSBDUsRHslPVXVxn1A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "User_number": "={{ $json.message.chatid }}",
+            "Nickname": "={{ $json.user.name }}",
+            "OS": "={{ $('Webhook').item.json.body.data.source }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "User_number",
+              "displayName": "User_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nickname",
+              "displayName": "Nickname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "OS",
+              "displayName": "OS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1152,
+        432
+      ],
+      "id": "2780e08b-df57-4249-b75e-d0b323e9b6e4",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UOWPZoYPApny206m",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8bb074e3-e807-4a7e-8be4-972acd1b7fc9",
+              "leftValue": "={{ $json.message.chatid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        352
+      ],
+      "id": "376ef4a5-b23a-41ba-a73f-5a486f66c92e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.message.chatid }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        704,
+        320
+      ],
+      "id": "643478e2-e736-4cc9-8414-379363d4fdc8",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b690b657-755e-4eed-b921-af694038c181",
+              "leftValue": "={{ $json.body.data.key.fromMe }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        0
+      ],
+      "id": "a8c12994-84d1-4b9e-9576-6b9ecf85fc59",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -96
+      ],
+      "id": "b12f47e6-08c1-459d-8bcb-ad1eadc0da5d",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n-n8n.vhphhd.easypanel.host",
+            "user-agent": "axios/1.7.9",
+            "content-length": "941",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.18.0.1",
+            "x-forwarded-host": "n8n-n8n.vhphhd.easypanel.host",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "b64134a0fcd8",
+            "x-real-ip": "172.18.0.1"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.upsert",
+            "instance": "Yachaybotv2",
+            "data": {
+              "key": {
+                "remoteJid": "51928905935@s.whatsapp.net",
+                "fromMe": false,
+                "id": "3AC8A7F0BB38EC14B210"
+              },
+              "pushName": "⚡️Edd⚡️",
+              "status": "DELIVERY_ACK",
+              "message": {
+                "conversation": "Que mas",
+                "messageContextInfo": {
+                  "deviceListMetadata": {
+                    "senderKeyHash": "CKDaA8bnCw1/VA==",
+                    "senderTimestamp": "1753929760",
+                    "recipientKeyHash": "hB3VK/Qs/LBtAg==",
+                    "recipientTimestamp": "1752332832"
+                  },
+                  "deviceListMetadataVersion": 2,
+                  "messageSecret": "C9/0FNlXyV+VuQk0AC1I9XJ0pQ56uqj7C7qyKszxe3Q="
+                }
+              },
+              "messageType": "conversation",
+              "messageTimestamp": 1753994116,
+              "instanceId": "af103ac9-060b-4a02-8dfa-67b13924fe29",
+              "source": "ios"
+            },
+            "destination": "https://n8n-n8n.vhphhd.easypanel.host/webhook/8c0c675e-0bf0-4ffd-98fc-4880ab9cd986",
+            "date_time": "2025-07-31T17:35:17.178Z",
+            "sender": "51925942529@s.whatsapp.net",
+            "server_url": "https://evolutionapo-evolution-api.vhphhd.easypanel.host",
+            "apikey": "DDE5E2239EE6-4323-8ECF-359FE20B968E"
+          },
+          "webhookUrl": "https://n8n-n8n.vhphhd.easypanel.host/webhook/8c0c675e-0bf0-4ffd-98fc-4880ab9cd986",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Text content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get image": {
+      "main": [
+        [
+          {
+            "node": "Convert image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert audio": {
+      "main": [
+        [
+          {
+            "node": "Audio description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert image": {
+      "main": [
+        [
+          {
+            "node": "Image analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image analysis": {
+      "main": [
+        [
+          {
+            "node": "Image description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image description": {
+      "main": [
+        [
+          {
+            "node": "Chat input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio description": {
+      "main": [
+        [
+          {
+            "node": "Audio content1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get audio": {
+      "main": [
+        [
+          {
+            "node": "Convert audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio content1": {
+      "main": [
+        [
+          {
+            "node": "Chat input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text content": {
+      "main": [
+        [
+          {
+            "node": "Chat input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat input": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Translate": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "categoria": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code7": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "categoria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Lima",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "2ff1e669-38bf-4d81-8f24-98bc6204c538",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0fe3d5bb008e5b96b18c215374c11f23ad8bf5bbd0a5b6ebd2b2dd15ce224b38"
+  },
+  "id": "6kt7Rq9QXXdaVXER",
+  "tags": [
+    {
+      "createdAt": "2025-07-31T03:49:56.053Z",
+      "updatedAt": "2025-07-31T03:49:56.053Z",
+      "id": "5XMGm7ErEv1GfomW",
+      "name": "OK"
+    }
+  ]
+}

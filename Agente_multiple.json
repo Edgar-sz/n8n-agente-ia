@@ -1,0 +1,1765 @@
+{
+  "name": "Agente_multiple",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bbdf668f-f365-4525-9d10-32344e0f153d",
+              "name": "instance.server_url",
+              "value": "={{ $json.body.server_url }}",
+              "type": "string"
+            },
+            {
+              "id": "ae5e14d0-cad9-4630-9e89-810b9c24c047",
+              "name": "instance.name",
+              "value": "={{ $json.body.instance }}",
+              "type": "string"
+            },
+            {
+              "id": "0611bfed-803f-4ee8-95db-184cde359c12",
+              "name": "instance.apikey",
+              "value": "={{ $json.body.apikey }}",
+              "type": "string"
+            },
+            {
+              "id": "f1e98297-3c2e-4f10-b60f-e768357c1b6d",
+              "name": "message.message_id",
+              "value": "={{ $json.body.data.key.id }}",
+              "type": "string"
+            },
+            {
+              "id": "ccf880f6-9524-4257-9ce2-8c6aa760dc3c",
+              "name": "message.chat_id",
+              "value": "={{ $json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "300d1631-80d9-404b-bb8c-0bb16d35ad35",
+              "name": "message.content_type",
+              "value": "={{ $json.body.data.message.extendedTextMessage ? 'text': '' }}{{ $json.body.data.message.conversation ? 'text': '' }}{{ $json.body.data.message.audioMessage ? 'audio': '' }}{{ $json.body.data.message.imageMessage ? 'image': '' }}",
+              "type": "string"
+            },
+            {
+              "id": "52d2bcf6-ee98-4816-9567-c77dbc802740",
+              "name": "message.content",
+              "value": "={{ $json.body.data.message.extendedTextMessage?.text || '' }}{{ $json.body.data.message.imageMessage?.caption || '' }}{{ $json.body.data.message.conversation || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "9c49833e-2ac7-49b5-864b-13fc730b1d77",
+              "name": "message.timestamp",
+              "value": "={{ $json.body.date_time.toDateTime().plus({ hours: 3 }).toLocal().toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "33e69fe5-8bf3-4a8f-8f3b-ef9c5d235238",
+              "name": "user.name",
+              "value": "={{ $json.body.data.pushName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2368,
+        32
+      ],
+      "id": "3a9e23c2-9125-424c-8eb9-fbb4141c6345",
+      "name": "Definir variables"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d360fea-3800-4b5b-a066-918a90eb1865",
+              "leftValue": "={{ $json.body.data.key.fromMe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2608,
+        16
+      ],
+      "id": "2e7c0aee-801f-4fd3-88b4-f965b8d6b7f5",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -2416,
+        -176
+      ],
+      "id": "ec5b723d-968c-4482-b9e0-5be24ad75982",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=nombre de usuario: {{ $('Definir variables').item.json.user.name }}\nmensaje: {{ $json.chat_input }}\ntipo de mensaje: {{ $('Definir variables').item.json.message.content_type }}\nhora y fecha actual: {{ $now }}",
+        "options": {
+          "systemMessage": "=1. DEFINICIÓN DE IDENTIDAD\nEres un asistente de inteligencia artificial diseñado para ayudar a cualquier persona que realice consultas sobre cualquier tema.\n\nTu rol es brindar información precisa, útil y oportuna. Si no conoces la respuesta o no estás completamente seguro, debes buscarla antes de responder. Actúa siempre como si tuvieras plena capacidad para interpretar correctamente cualquier entrada del usuario, ya sea texto, imagen o audio.\n\n2. HERRAMIENTAS DISPONIBLES\nthink\nSiempre úsala antes de actuar. Resume mentalmente la consulta y organiza tu respuesta.\n\nbusqueda_internet\nUtilízala siempre que no estés completamente seguro de la respuesta o si necesitas información actualizada. Una vez obtenida, resume y estructura la respuesta para el usuario.\n\n3. OBJETIVO PRINCIPAL\nBrindar respuestas claras, breves y certeras a las preguntas de los usuarios, ayudando en lo que necesiten sin inventar información.\n\n4. INSTRUCCIONES ESPECÍFICAS\nUsa siempre la herramienta \"think\" antes de realizar una acción o dar una respuesta.\n\nSi no estás seguro de una respuesta o no cuentas con suficiente información, usa \"busqueda_internet\" para obtenerla.\n\nNunca inventes respuestas.\n\nResponde de forma clara, directa y útil.\n\nSolo saluda una vez al inicio de la conversación. Si te vuelven a saludar, responde con cortesía pero no repitas el saludo completo.\n\nEvita repetir constantemente el nombre del usuario. Menciónalo solo una vez si es necesario.\n\nPuedes usar emojis si ayudan a hacer la conversación más amena.\n\nSi la consulta incluye temas complejos, desglosa la información de forma accesible.\n\nSiempre interpreta imágenes y audios como si pudieras verlos o escucharlos realmente. No expliques que estás \"interpretando\" o que \"parece que\", simplemente responde con seguridad sobre el contenido recibido.\n\nNunca informes al usuario que eres una inteligencia artificial con limitaciones. Comunica siempre con naturalidad, fluidez y confianza.\n\nMantén una actitud profesional, empática y colaborativa en todo momento.\n\n5. NOTAS IMPORTANTES PARA TI\nNo des respuestas sin antes reflexionar brevemente (\"think\").\n\nUsa la herramienta \"busqueda_internet\" si tienes cualquier duda.\n\nJamás brindes datos incorrectos, desactualizados o especulativos.\n\nMantén la interacción eficiente, cálida y orientada a resolver.\n\nNo uses comillas ni asteriscos innecesarios.\n\nTu prioridad es que el usuario comprenda la información, se sienta acompañado y reciba valor en cada respuesta.\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1712,
+        -48
+      ],
+      "id": "65449b92-2692-4ed7-aa59-4d37eda5a5a6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1664,
+        144
+      ],
+      "id": "424ee02f-5c91-49e4-b068-b7eafc9b7a2e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "bWIXdkYAI1mez6zQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Definir variables').item.json.message.chat_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1808,
+        160
+      ],
+      "id": "515bcb3e-a4a3-415c-bd1a-a792144c813b",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "16ce6f11-1671-43e4-8e99-8835669b0ced"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8ac94754-0da6-4ccd-a668-e7f00f03f25f",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Imagen"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c74febb-d34a-44d9-8005-adfeda0aeee8",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Other"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -352,
+        0
+      ],
+      "id": "3ad7fb60-4f23-429b-a032-1bdd2fdfca50",
+      "name": "Switch type"
+    },
+    {
+      "parameters": {
+        "content": "IMPORTANTE: no dejar espacios entre las lineas de codigo ni saltos de linea.\nSe agregaron 3 horas al timestamp por el desfase horario.\nAgregar .tolocal().toISO()"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2448,
+        208
+      ],
+      "typeVersion": 1,
+      "id": "b39f456c-0838-4937-b4d5-320befedf3b4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Definir variables').item.json.instance.server_url }}/chat/getBase64FromMediaMessage/{{ $('Definir variables').item.json.instance.name }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Definir variables').item.json.instance.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message.key.id",
+              "value": "={{ $('Definir variables').item.json.message.message_id }}"
+            },
+            {
+              "name": "convertToMp4",
+              "value": "={{Boolean(False)}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -64,
+        -224
+      ],
+      "id": "65fdd2de-032f-4dcf-8872-c54e11b4f375",
+      "name": "Get Audio"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "mimeType": "={{ $json.mimetype }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        144,
+        -224
+      ],
+      "id": "4de40822-6609-4d06-915e-0ddb7bb79c38",
+      "name": "Convert audio"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {
+          "language": "es"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        352,
+        -224
+      ],
+      "id": "113added-22c9-4a47-b06c-2ac4c8a13dd5",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "bWIXdkYAI1mez6zQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f0251e7b-415e-4722-94bf-a43407b7c73a",
+              "name": "content",
+              "value": "=<audio>\n{{ $json.text }}\n</audio>",
+              "type": "string"
+            },
+            {
+              "id": "4f421b0e-fccf-4c9f-8863-6a55c974bda1",
+              "name": "timestamp",
+              "value": "={{ $('Json parse').item.json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        -224
+      ],
+      "id": "3261ee74-26d8-4ae6-b30a-c71c55a0740f",
+      "name": "Audio content"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Definir variables').item.json.instance.server_url }}/chat/getBase64FromMediaMessage/{{ $('Definir variables').item.json.instance.name }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Definir variables').item.json.instance.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message.key.id",
+              "value": "={{ $('Definir variables').item.json.message.message_id }}"
+            },
+            {
+              "name": "convertToMp4",
+              "value": "={{Boolean(False)}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -64,
+        -48
+      ],
+      "id": "c06caf00-0f67-40b2-be91-b1f82c0324d2",
+      "name": "Get Image"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "mimeType": "={{ $json.mimetype }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        144,
+        -48
+      ],
+      "id": "ea7eb8ea-9769-4265-ad14-139b671324dc",
+      "name": "Convert image"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f0251e7b-415e-4722-94bf-a43407b7c73a",
+              "name": "content",
+              "value": "={{ $('Get Image').item.json.caption }}\n<image>\n{{ $json.content }}\n</image>",
+              "type": "string"
+            },
+            {
+              "id": "620b79d1-7f6e-4538-825e-60d7d66477e3",
+              "name": "timestamp",
+              "value": "={{ $('Json parse').item.json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        -48
+      ],
+      "id": "4b7e43fd-0356-4d1b-984b-55310ad1e53d",
+      "name": "Image content"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Describe la imagen en español",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        352,
+        -48
+      ],
+      "id": "e50ba348-a212-4d3b-a959-5e7c53539b81",
+      "name": "Describe image",
+      "credentials": {
+        "openAiApi": {
+          "id": "bWIXdkYAI1mez6zQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aac875c5-b35f-49d5-ae3e-a95f658aaafb",
+              "name": "chat_input",
+              "value": "={{ $json.messages.join('\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1504,
+        -48
+      ],
+      "id": "e50cf6d3-17ca-4715-9982-81adcedf3f35",
+      "name": "Chat inpunt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86fb85b6-8d8e-4741-9c10-a6f492129825",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "3cd5397b-c020-4c23-bad0-dc2a060b41ba",
+              "name": "timestamp",
+              "value": "={{ $('Json parse').item.json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        128
+      ],
+      "id": "7cc676d9-0391-46be-b208-cf5b719a2a48",
+      "name": "Text Content"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('Definir variables').item.json.message.chat_id }}_buffer",
+        "messageData": "={{ JSON.stringify($('Definir variables').item.json.message) }}",
+        "tail": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1744,
+        32
+      ],
+      "id": "9a269540-e485-422f-b8f1-1054fe9f5a2b",
+      "name": "Push message buffer",
+      "credentials": {
+        "redis": {
+          "id": "kgflwe8RuEYcjwOP",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "message",
+        "key": "={{ $('Definir variables').item.json.message.chat_id }}_buffer",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        32
+      ],
+      "id": "79bb6b35-746e-4ed7-ae1e-c04a2d5e7d2f",
+      "name": "Get message buffer",
+      "credentials": {
+        "redis": {
+          "id": "kgflwe8RuEYcjwOP",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.message.first()).message_id }}",
+                    "rightValue": "={{ $('Push message buffer').item.json.message.message_id }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    },
+                    "id": "7b7279ae-d26e-4f49-b20e-21b5d98cf399"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No hacer nada"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8891eec7-1d3a-407f-84bf-14ebb1869892",
+                    "leftValue": "={{ JSON.parse($json.message.last()).timestamp }}",
+                    "rightValue": "={{ $now.minus(7,'seconds').toLocal().toISO() }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Seguir"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Esperar"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1328,
+        32
+      ],
+      "id": "b08a8163-06ef-4472-8212-2038be0aa3e4",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "amount": 7
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1120,
+        208
+      ],
+      "id": "93ceb0f4-1469-4212-998b-64f1e18b473d",
+      "name": "Wait",
+      "webhookId": "5c20353b-a089-42aa-9301-0cee37735ea6"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        -128
+      ],
+      "id": "bbabb13e-a520-41e6-b411-b77394a5822d",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Definir variables').item.json.message.chat_id }}_buffer"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        32
+      ],
+      "id": "901794b6-8871-4b89-9def-32d2266859f9",
+      "name": "Delete message buffer",
+      "credentials": {
+        "redis": {
+          "id": "kgflwe8RuEYcjwOP",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        32
+      ],
+      "id": "1d04555c-a393-4476-a25d-253c73c99151",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ JSON.parse($json.message) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -624,
+        32
+      ],
+      "id": "7572489d-8c68-45b9-abc2-57de7f2330e0",
+      "name": "Json parse"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        848,
+        -64
+      ],
+      "id": "df7b7ade-797f-4f4c-9668-b6a2b99c2bf5",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "timestamp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        -64
+      ],
+      "id": "69f86a78-12f9-440c-85bd-0986e0ba0be4",
+      "name": "Sort"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content",
+              "renameField": true,
+              "outputFieldName": "messages"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        -64
+      ],
+      "id": "55f46bf4-8514-4885-849d-54f8dcbf11eb",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "options": {
+          "hl": "es"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        160
+      ],
+      "id": "04445b4f-76fe-4693-8330-e99d8df39857",
+      "name": "busqueda_internet",
+      "credentials": {
+        "serpApi": {
+          "id": "ZGbeqLNSitREpLw6",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Permite a la IA organizar mentalmente la intención del usuario antes de responder o usar otra herramienta. Se utiliza para reflexionar, resumir el problema, planificar la respuesta o decidir si es necesario buscar más información. Esto mejora la precisión y evita errores."
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        1920,
+        240
+      ],
+      "id": "4ab94d04-a975-4536-b135-fafa7499f073",
+      "name": "think"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Definir variables').item.json.instance.server_url }}/message/sendText/{{ $('Definir variables').item.json.instance.name }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Definir variables').item.json.instance.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Definir variables').item.json.message.chat_id }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "name": "delay",
+              "value": "={{2000}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2112,
+        -48
+      ],
+      "id": "fc155d6f-f267-472f-8896-45a37838f0fa",
+      "name": "Mensaje Whatsapp"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "0d3e6fb6-8b40-4542-b29c-416a2a1049a2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2816,
+        16
+      ],
+      "id": "1eb29268-f0eb-4059-927e-12049abd639f",
+      "name": "Recepción mensaje",
+      "webhookId": "0d3e6fb6-8b40-4542-b29c-416a2a1049a2"
+    },
+    {
+      "parameters": {
+        "content": "Modificar los segundos de espera en el wait y en el switch",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1616,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "c054f92f-09d8-4550-add7-ac5318248dfc",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1mgy3uArqb4--xlc_tCAovWR1bkyMyYr6dk3NiQcdbjw",
+          "mode": "list",
+          "cachedResultName": "Usuarios_chatbot",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mgy3uArqb4--xlc_tCAovWR1bkyMyYr6dk3NiQcdbjw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Usuarios",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mgy3uArqb4--xlc_tCAovWR1bkyMyYr6dk3NiQcdbjw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha de registro": "={{ DateTime.fromISO($json.message.timestamp).toFormat('dd/MM/yyyy HH:mm:ss') }}\n",
+            "Numero de usuario": "=+{{ $json.message.chat_id.split('@')[0] }}",
+            "Nick name": "={{ $json.user.name }}",
+            "OS": "={{ $('Recepción mensaje').item.json.body.data.source }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha de registro",
+              "displayName": "Fecha de registro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Numero de usuario",
+              "displayName": "Numero de usuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nick name",
+              "displayName": "Nick name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "OS",
+              "displayName": "OS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -1776,
+        448
+      ],
+      "id": "6553aadc-4c14-4353-920d-00af60abe979",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UOWPZoYPApny206m",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.message.chat_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        -2096,
+        256
+      ],
+      "id": "c81d09e3-de21-4cf6-81fa-c34b5fe06ad6",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "content": "Verifica que los datos recibidos sean unicos en el flujo, para la segunda vez que los recibe los descarta ya que no puede haber duplicados.",
+        "height": 128
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2160,
+        416
+      ],
+      "typeVersion": 1,
+      "id": "94ac23d9-12be-4248-b305-cfb2dc5b83fc",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $('AI Agent').item.json.output }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Consulta tecnica",
+              "description": "Esta categoría agrupa preguntas relacionadas con tecnología, informática, programación, herramientas digitales y temas técnicos en general. Los usuarios que hagan este tipo de consultas suelen buscar ayuda para resolver problemas con software, comprender conceptos técnicos o aprender a usar plataformas tecnológicas específicas."
+            },
+            {
+              "category": "Consulta academica",
+              "description": "Incluye preguntas vinculadas a materias escolares o universitarias como matemáticas, ciencias, historia, literatura, entre otras. Las personas que hacen estas consultas suelen estar estudiando y buscan explicaciones claras, definiciones o ayuda para entender temas teóricos o resolver ejercicios."
+            },
+            {
+              "category": "Consulta personal",
+              "description": "Esta categoría abarca preguntas sobre la vida diaria, desarrollo personal, salud, organización del tiempo, relaciones, alimentación y otros temas prácticos que afectan la rutina de los usuarios. Son consultas orientadas a mejorar el bienestar o resolver dudas comunes del día a día."
+            },
+            {
+              "category": "Consulta de entretenimiento",
+              "description": "Agrupa todas las preguntas relacionadas con ocio y cultura popular, como recomendaciones de películas, música, libros, videojuegos, series o eventos actuales. Estas consultas suelen tener un tono más relajado y están dirigidas a disfrutar el tiempo libre o mantenerse actualizado."
+            }
+          ]
+        },
+        "options": {
+          "fallback": "discard"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        2352,
+        -64
+      ],
+      "id": "3416ab16-aa54-4ffe-a7b7-bd6a83f14517",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2272,
+        208
+      ],
+      "id": "4d64b475-49e3-4f50-8556-c06343b97a91",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "bWIXdkYAI1mez6zQ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Consulta técnica\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2816,
+        -304
+      ],
+      "id": "1f3c5d4e-53bf-4802-a9bd-cf709d515244",
+      "name": "Consulta tecnica"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Consulta académica\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2816,
+        -160
+      ],
+      "id": "7003cf40-2b3a-4ab2-8bf2-751d98b89845",
+      "name": "Consulta academica"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Consulta personal\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2816,
+        -16
+      ],
+      "id": "55af1fa8-7f9a-41d6-abaa-501f85afd0ff",
+      "name": "Consulta personal"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      categoria: \"Consulta de entretenimiento\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2816,
+        128
+      ],
+      "id": "286e72c6-5219-40d7-baab-0375b7afcce4",
+      "name": "Consulta entretenimiento"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3184,
+        -144
+      ],
+      "id": "2161226e-ade9-47f8-8057-d04c36eaabce",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "tableId": "BD prueba",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "created_at_user",
+              "fieldValue": "={{ $('Recepción mensaje').item.json.body.date_time.toDateTime().plus({hours:3}).toLocal().toFormat(\"dd/MM/yyyy HH:mm:ss\") }}\n"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "={{ $('Chat inpunt').item.json.chat_input }}"
+            },
+            {
+              "fieldId": "recipient",
+              "fieldValue": "={{ $('Definir variables').item.json.message.chat_id.split('@')[0] }}"
+            },
+            {
+              "fieldId": "sender",
+              "fieldValue": "={{ $('Recepción mensaje').item.json.body.sender }}"
+            },
+            {
+              "fieldId": "message_type",
+              "fieldValue": "={{ $('Definir variables').item.json.message.content_type }}"
+            },
+            {
+              "fieldId": "nickname",
+              "fieldValue": "={{ $('Definir variables').item.json.user.name }}"
+            },
+            {
+              "fieldId": "device",
+              "fieldValue": "={{ $('Recepción mensaje').item.json.body.data.source }}"
+            },
+            {
+              "fieldId": "category",
+              "fieldValue": "={{ $json.categoria }}"
+            },
+            {
+              "fieldId": "airesponse",
+              "fieldValue": "={{ $('AI Agent').item.json.output }}"
+            },
+            {
+              "fieldId": "create_at_airesponse",
+              "fieldValue": "={{ DateTime.fromSeconds($('Mensaje Whatsapp').item.json.messageTimestamp).toLocal().toFormat(\"dd/MM/yyyy HH:mm:ss\") }}\n\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3392,
+        -144
+      ],
+      "id": "0463458f-b3c4-4fe5-9a90-1c3a90043268",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "vDrm6OsvfN6lCksH",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Recepción mensaje": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n-n8n.vhphhd.easypanel.host",
+            "user-agent": "axios/1.7.9",
+            "content-length": "993",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.18.0.1",
+            "x-forwarded-host": "n8n-n8n.vhphhd.easypanel.host",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "b64134a0fcd8",
+            "x-real-ip": "172.18.0.1"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.upsert",
+            "instance": "Test",
+            "data": {
+              "key": {
+                "remoteJid": "51928905935@s.whatsapp.net",
+                "fromMe": false,
+                "id": "3A09257428C7B2F8AE60"
+              },
+              "pushName": "⚡️Edd⚡️",
+              "status": "DELIVERY_ACK",
+              "message": {
+                "conversation": "Como puedo aprender n8n de la mejor manera y de manera autodidacta",
+                "messageContextInfo": {
+                  "deviceListMetadata": {
+                    "senderKeyHash": "CKDaA8bnCw1/VA==",
+                    "senderTimestamp": "1753929760",
+                    "recipientKeyHash": "hB3VK/Qs/LBtAg==",
+                    "recipientTimestamp": "1752332832"
+                  },
+                  "deviceListMetadataVersion": 2,
+                  "messageSecret": "CGH8GD5Bc99oQcJJ4FngX/bt3GcBFd5ewKkhC4mtue4="
+                }
+              },
+              "messageType": "conversation",
+              "messageTimestamp": 1754074823,
+              "instanceId": "d6f90495-f027-49cf-9f02-4ae7baf33623",
+              "source": "ios"
+            },
+            "destination": "https://n8n-n8n.vhphhd.easypanel.host/webhook/0d3e6fb6-8b40-4542-b29c-416a2a1049a2",
+            "date_time": "2025-08-01T16:00:23.788Z",
+            "sender": "51925942529@s.whatsapp.net",
+            "server_url": "https://evolutionapo-evolution-api.vhphhd.easypanel.host",
+            "apikey": "77E7A9D2C080-414A-A243-3474094000C6"
+          },
+          "webhookUrl": "https://n8n-n8n.vhphhd.easypanel.host/webhook/0d3e6fb6-8b40-4542-b29c-416a2a1049a2",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Definir variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Definir variables": {
+      "main": [
+        [
+          {
+            "node": "Push message buffer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Mensaje Whatsapp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch type": {
+      "main": [
+        [
+          {
+            "node": "Get Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Text Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Audio": {
+      "main": [
+        [
+          {
+            "node": "Convert audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert audio": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Audio content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "Convert image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert image": {
+      "main": [
+        [
+          {
+            "node": "Describe image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Describe image": {
+      "main": [
+        [
+          {
+            "node": "Image content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Text Content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Chat inpunt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push message buffer": {
+      "main": [
+        [
+          {
+            "node": "Get message buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get message buffer": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete message buffer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get message buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete message buffer": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Json parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Json parse": {
+      "main": [
+        [
+          {
+            "node": "Switch type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Chat inpunt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busqueda_internet": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recepción mensaje": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensaje Whatsapp": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Consulta tecnica",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Consulta academica",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Consulta personal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Consulta entretenimiento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consulta tecnica": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consulta academica": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Consulta personal": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Consulta entretenimiento": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Lima",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "4148b9ed-9359-4b35-bc05-e9c222a93176",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0fe3d5bb008e5b96b18c215374c11f23ad8bf5bbd0a5b6ebd2b2dd15ce224b38"
+  },
+  "id": "q8hRLBTX4ZGYzHG0",
+  "tags": [
+    {
+      "createdAt": "2025-07-31T03:49:56.053Z",
+      "updatedAt": "2025-07-31T03:49:56.053Z",
+      "id": "5XMGm7ErEv1GfomW",
+      "name": "OK"
+    }
+  ]
+}
